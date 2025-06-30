@@ -8,6 +8,7 @@ defmodule HeadsUpWeb.Router do
     plug :put_root_layout, html: {HeadsUpWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :snoop
   end
 
   pipeline :api do
@@ -18,6 +19,14 @@ defmodule HeadsUpWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  def snoop(conn, _opts) do
+    answer = ~w(Yes No Maybe) |> Enum.random()
+    conn = assign(conn, :answer, answer)
+
+    IO.inspect(conn, label: "Snoop")
+    conn
   end
 
   # Other scopes may use custom stacks.
