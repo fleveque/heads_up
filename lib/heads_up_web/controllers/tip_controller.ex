@@ -9,4 +9,16 @@ defmodule HeadsUpWeb.TipController do
 
     render(conn, :index, emojis: emojis, tips: tips)
   end
+
+  def show(conn, %{"id" => id}) do
+    case Tips.get_tip(id) do
+      nil ->
+        conn
+        |> put_flash(:error, "Tip not found")
+        |> redirect(to: "/tips")
+
+      tip ->
+        render(conn, :show, tip: tip)
+    end
+  end
 end
