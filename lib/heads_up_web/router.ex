@@ -20,6 +20,7 @@ defmodule HeadsUpWeb.Router do
 
     get "/", PageController, :home
     get "/tips", TipController, :index
+    get "/tips/:id", TipController, :show
   end
 
   def snoop(conn, _opts) do

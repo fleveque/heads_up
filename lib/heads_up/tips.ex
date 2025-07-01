@@ -15,4 +15,14 @@ defmodule HeadsUp.Tips do
       }
     ]
   end
+
+  def get_tip(id) when is_integer(id) do
+    Enum.find(list_tips(), fn tip -> tip.id == id end)
+  end
+
+  def get_tip(id) when is_binary(id) do
+    id
+    |> String.to_integer()
+    |> get_tip()
+  end
 end
