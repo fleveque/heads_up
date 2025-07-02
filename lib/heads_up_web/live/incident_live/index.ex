@@ -2,6 +2,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   use HeadsUpWeb, :live_view
 
   alias HeadsUp.Incidents
+  import HeadsUpWeb.CustomComponents
 
   def mount(_params, _session, socket) do
     incidents = Incidents.list_incidents()
@@ -27,21 +28,11 @@ defmodule HeadsUpWeb.IncidentLive.Index do
       <img src={@incident.image_path} />
       <h2>{@incident.name}</h2>
       <div class="details">
-        <.badge status={@incident.status} />
+        <.badge status={@incident.status} class="animate-pulse" />
         <div class="priority">
           {@incident.priority}
         </div>
       </div>
-    </div>
-    """
-  end
-
-  attr :status, :atom, values: [:pending, :resolved, :canceled], default: :pending
-
-  def badge(assigns) do
-    ~H"""
-    <div class="badge">
-      {@status}
     </div>
     """
   end
