@@ -8,7 +8,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
     socket =
       socket
       |> assign(:page_title, "Incidents")
-      |> stream(:incidents, Incidents.list_incidents())
+      |> stream(:incidents, Incidents.filter_incidents())
 
     # IO.inspect(socket.assigns.streams.incidents, label: "MOUNT")
 
