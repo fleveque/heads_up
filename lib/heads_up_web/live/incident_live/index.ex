@@ -20,7 +20,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   def handle_params(params, _uri, socket) do
     socket =
       socket
-      |> stream(:incidents, Incidents.filter_incidents(params))
+      |> stream(:incidents, Incidents.filter_incidents(params), reset: true)
       |> assign(form: to_form(params), page_title: "Incidents")
 
     {:noreply, socket}
@@ -65,7 +65,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
         ]}
         prompt="Sort By"
       />
-      <.link navigate={~p"/incidents"}>
+      <.link patch={~p"/incidents"}>
         Reset
       </.link>
     </.form>
@@ -99,7 +99,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
       |> Map.reject(fn {_k, v} -> v in ["", nil] end)
 
     socket =
-      push_navigate(
+      push_patch(
         socket,
         to: ~p"/incidents?#{params}"
       )
