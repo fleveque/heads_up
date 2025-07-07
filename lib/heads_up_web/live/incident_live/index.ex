@@ -7,8 +7,8 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:page_title, "Incidents")
-      |> stream(:incidents, Incidents.filter_incidents())
+      |> stream(:incidents, Incidents.list_incidents())
+      |> assign(form: to_form(%{}), page_title: "Incidents")
 
     # IO.inspect(socket.assigns.streams.incidents, label: "MOUNT")
 
@@ -31,6 +31,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
           Thanks for pitching in. {vibe}
         </:tagline>
       </.headline>
+      <.filter_form form={@form} />
       <div class="incidents" id="incidents" phx-update="stream">
         <.incident_card
           :for={{dom_id, incident} <- @streams.incidents}
@@ -39,6 +40,16 @@ defmodule HeadsUpWeb.IncidentLive.Index do
         />
       </div>
     </div>
+    """
+  end
+
+  def filter_form(assigns) do
+    ~H"""
+    <.form for={@form}>
+      <.input field={@form[:q]} placeholder="Search..." autocomplete="off" />
+      <.input type="select" field={@form[:status]} options={Incidents.statuses()} prompt="Status" />
+      <.input type="select" field={@form[:sort_by]} options={[:name, :priority]} prompt="Sort By" />
+    </.form>
     """
   end
 

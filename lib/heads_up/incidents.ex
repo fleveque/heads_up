@@ -28,4 +28,8 @@ defmodule HeadsUp.Incidents do
     |> limit(3)
     |> Repo.all()
   end
+
+  def statuses do
+    Ecto.Enum.values(Incident, :status)
+  end
 end
