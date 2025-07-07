@@ -8,10 +8,10 @@ defmodule HeadsUp.Incidents do
     Repo.all(Incident)
   end
 
-  def filter_incidents do
+  def filter_incidents(filter) do
     Incident
-    |> where(status: :resolved)
-    |> where([i], ilike(i.name, ^"%in%"))
+    |> where(status: ^filter["status"])
+    |> where([i], ilike(i.name, ^"%#{filter["q"]}%"))
     |> order_by(desc: :name)
     |> Repo.all()
   end
