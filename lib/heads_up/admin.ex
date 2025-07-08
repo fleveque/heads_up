@@ -15,4 +15,8 @@ defmodule HeadsUp.Admin do
     |> Incident.changeset(attrs)
     |> Repo.insert()
   end
+
+  def change_incident(%Incident{} = incident, attrs \\ %{}) do
+    Incident.changeset(incident, attrs)
+  end
 end
