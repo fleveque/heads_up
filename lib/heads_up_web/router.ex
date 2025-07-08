@@ -29,6 +29,7 @@ defmodule HeadsUpWeb.Router do
 
     # Admin section
     live "/admin/incidents", AdminIncidentLive.Index
+    live "/admin/incidents/new", AdminIncidentLive.Form
   end
 
   def snoop(conn, _opts) do
