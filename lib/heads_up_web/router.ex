@@ -26,6 +26,9 @@ defmodule HeadsUpWeb.Router do
     live "/effort", EffortLive
     live "/incidents", IncidentLive.Index
     live "/incidents/:id", IncidentLive.Show
+
+    # Admin section
+    live "/admin/incidents", AdminIncidentLive.Index
   end
 
   def snoop(conn, _opts) do
