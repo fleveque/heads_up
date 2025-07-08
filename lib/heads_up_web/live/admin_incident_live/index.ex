@@ -2,7 +2,6 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
   use HeadsUpWeb, :live_view
 
   alias HeadsUp.Admin
-  alias HeadsUp.Incidents.Incident
   import HeadsUpWeb.CustomComponents
 
   def mount(_params, _session, socket) do
@@ -19,6 +18,11 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
     <div class="admin-index">
       <.header>
         {@page_title}
+        <:actions>
+          <.link navigate={~p"/admin/incidents/new"} class="button">
+            New Incident
+          </.link>
+        </:actions>
       </.header>
       <.table id="incidents" rows={@streams.incidents}>
         <:col :let={{_dom_id, incident}} label="name">
