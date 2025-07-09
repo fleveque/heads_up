@@ -10,6 +10,8 @@ defmodule HeadsUp.Incidents.Incident do
     field :image_path, :string, default: "/images/placeholder.jpg"
 
     timestamps(type: :utc_datetime)
+
+    belongs_to :category, HeadsUp.Categories.Category
   end
 
   @doc false

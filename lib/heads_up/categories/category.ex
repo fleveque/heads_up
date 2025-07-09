@@ -7,6 +7,8 @@ defmodule HeadsUp.Categories.Category do
     field :slug, :string
 
     timestamps(type: :utc_datetime)
+
+    has_many :incidents, HeadsUp.Incidents.Incident
   end
 
   @doc false
