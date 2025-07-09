@@ -17,10 +17,11 @@ defmodule HeadsUp.Incidents.Incident do
   @doc false
   def changeset(incident, attrs) do
     incident
-    |> cast(attrs, [:name, :description, :priority, :status, :image_path])
-    |> validate_required([:name, :description, :priority, :status, :image_path])
+    |> cast(attrs, [:name, :description, :priority, :status, :image_path, :category_id])
+    |> validate_required([:name, :description, :priority, :status, :image_path, :category_id])
     |> validate_length(:name, min: 3, max: 100)
     |> validate_length(:description, min: 10, max: 500)
     |> validate_number(:priority, greater_than: 0, less_than: 3)
+    |> assoc_constraint(:category)
   end
 end
