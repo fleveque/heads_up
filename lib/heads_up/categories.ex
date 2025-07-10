@@ -58,6 +58,21 @@ defmodule HeadsUp.Categories do
   end
 
   @doc """
+  Returns a list of category names and their slugs, ordered by name.
+  ## Examples
+
+      iex> category_names_and_slugs()
+      [{"Category 1", "category-1"}, {"Category 2", "category-2"}, ...]
+
+  """
+  def category_names_and_slugs do
+    Category
+    |> select([c], {c.name, c.slug})
+    |> order_by(:name)
+    |> Repo.all()
+  end
+
+  @doc """
   Creates a category.
 
   ## Examples

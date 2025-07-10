@@ -1,7 +1,9 @@
 defmodule HeadsUpWeb.IncidentLive.Index do
+  alias HeadsUp.Categories.Category
   use HeadsUpWeb, :live_view
 
   alias HeadsUp.Incidents
+  alias HeadsUp.Categories
   import HeadsUpWeb.CustomComponents
 
   def mount(_params, _session, socket) do
@@ -13,6 +15,9 @@ defmodule HeadsUpWeb.IncidentLive.Index do
     #       IO.inspect(socket.assigns.streams.incidents, label: "AFTER RENDER")
     #       socket
     #   end)
+    socket =
+      socket
+      |> assign(category_options: Categories.category_names_and_slugs())
 
     {:ok, socket}
   end
@@ -35,7 +40,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
           Thanks for pitching in. {vibe}
         </:tagline>
       </.headline>
-      <.filter_form form={@form} />
+      <.filter_form form={@form} category_options={@category_options} />
       <div class="incidents" id="incidents" phx-update="stream">
         <div id="empty" class="no-results only:block hidden">
           No incidents found. Try changing your filters.
@@ -50,18 +55,23 @@ defmodule HeadsUpWeb.IncidentLive.Index do
     """
   end
 
+  attr :category_options, :list, required: true
+  attr :form, :map, required: true
+
   def filter_form(assigns) do
     ~H"""
     <.form for={@form} id="filter-form" phx-change="filter" phx-submit="filter">
       <.input field={@form[:q]} placeholder="Search..." autocomplete="off" phx-debounce="1000" />
       <.input type="select" field={@form[:status]} options={Incidents.statuses()} prompt="Status" />
+      <.input type="select" field={@form[:category]} options={@category_options} prompt="Category" />
       <.input
         type="select"
         field={@form[:sort_by]}
         options={[
           Name: "name",
           "Priority (High to Low)": "priority_desc",
-          "Priority (Low to High)": "priority_asc"
+          "Priority (Low to High)": "priority_asc",
+          Category: "category"
         ]}
         prompt="Sort By"
       />
@@ -98,7 +108,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   def handle_event("filter", params, socket) do
     params =
       params
-      |> Map.take(~w(q status sort_by))
+      |> Map.take(~w(q status sort_by category))
       |> Map.reject(fn {_k, v} -> v in ["", nil] end)
 
     socket =
