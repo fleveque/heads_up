@@ -1,5 +1,4 @@
 defmodule HeadsUpWeb.IncidentLive.Index do
-  alias HeadsUp.Categories.Category
   use HeadsUpWeb, :live_view
 
   alias HeadsUp.Incidents

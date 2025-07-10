@@ -1,5 +1,4 @@
 defmodule HeadsUpWeb.AdminIncidentLive.Form do
-  alias Plug.Head
   use HeadsUpWeb, :live_view
 
   alias HeadsUp.Incidents.Incident
