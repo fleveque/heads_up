@@ -81,6 +81,23 @@ defmodule HeadsUp.Accounts do
   end
 
   @doc """
+  Promotes a user to admin.
+  ## Examples
+
+      iex> promote_to_admin(user)
+      {:ok, %User{}}
+
+      iex> promote_to_admin(%User{is_admin: true})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def promote_to_admin(%User{} = user) do
+    user
+    |> Ecto.Changeset.change(%{is_admin: true})
+    |> Repo.update()
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
   ## Examples
