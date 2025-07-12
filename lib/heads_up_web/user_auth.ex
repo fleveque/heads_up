@@ -165,7 +165,7 @@ defmodule HeadsUpWeb.UserAuth do
   end
 
   def on_mount(:ensure_admin, _params, _session, socket) do
-    if socket.assigns.current_user.username == "fleveque" do
+    if socket.assigns.current_user.is_admin do
       {:cont, socket}
     else
       socket =
@@ -230,7 +230,7 @@ defmodule HeadsUpWeb.UserAuth do
   Used for routes that require the user to be an admin.
   """
   def require_admin(conn, _opts) do
-    if conn.assigns.current_user.username == "fleveque" do
+    if conn.assigns.current_user.is_admin do
       conn
     else
       conn
