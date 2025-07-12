@@ -179,6 +179,7 @@ nature =
 |> User.registration_changeset(%{
   email: "francesc@example.com",
   username: "fleveque",
+  admin: true,
   password: "123456123456"
 })
 |> Repo.insert!()
