@@ -52,6 +52,11 @@
           </.link>
         </li>
       <% end %>
+      <%= if assigns[:current_time] do %>
+        <li class="text-[0.8125rem] leading-6 text-zinc-900">
+          Current time: {assigns[:current_time]}
+        </li>
+      <% end %>
     </ul>
     {@inner_content}
   </body>

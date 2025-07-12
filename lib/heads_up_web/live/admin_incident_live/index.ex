@@ -4,8 +4,6 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
   alias HeadsUp.Admin
   import HeadsUpWeb.CustomComponents
 
-  on_mount {HeadsUpWeb.UserAuth, :ensure_authenticated}
-
   def mount(_params, _session, socket) do
     socket =
       socket

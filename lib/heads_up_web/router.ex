@@ -31,18 +31,21 @@ defmodule HeadsUpWeb.Router do
     live "/incidents/:id", IncidentLive.Show
   end
 
+  # Admin section
   scope "/", HeadsUpWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    # Admin section
-    live "/admin/incidents", AdminIncidentLive.Index
-    live "/admin/incidents/new", AdminIncidentLive.Form, :new
-    live "/admin/incidents/:id/edit", AdminIncidentLive.Form, :edit
+    live_session :admin,
+      on_mount: [{HeadsUpWeb.UserAuth, :ensure_authenticated}, {HeadsUpWeb.Hooks, :current_time}] do
+      live "/admin/incidents", AdminIncidentLive.Index
+      live "/admin/incidents/new", AdminIncidentLive.Form, :new
+      live "/admin/incidents/:id/edit", AdminIncidentLive.Form, :edit
 
-    live "/categories", CategoryLive.Index, :index
-    live "/categories/new", CategoryLive.Form, :new
-    live "/categories/:id", CategoryLive.Show, :show
-    live "/categories/:id/edit", CategoryLive.Form, :edit
+      live "/categories", CategoryLive.Index, :index
+      live "/categories/new", CategoryLive.Form, :new
+      live "/categories/:id", CategoryLive.Show, :show
+      live "/categories/:id/edit", CategoryLive.Form, :edit
+    end
   end
 
   def snoop(conn, _opts) do
