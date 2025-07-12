@@ -33,10 +33,14 @@ defmodule HeadsUpWeb.Router do
 
   # Admin section
   scope "/", HeadsUpWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser, :require_authenticated_user, :require_admin]
 
     live_session :admin,
-      on_mount: [{HeadsUpWeb.UserAuth, :ensure_authenticated}, {HeadsUpWeb.Hooks, :current_time}] do
+      on_mount: [
+        {HeadsUpWeb.UserAuth, :ensure_authenticated},
+        {HeadsUpWeb.UserAuth, :ensure_admin},
+        {HeadsUpWeb.Hooks, :current_time}
+      ] do
       live "/admin/incidents", AdminIncidentLive.Index
       live "/admin/incidents/new", AdminIncidentLive.Form, :new
       live "/admin/incidents/:id/edit", AdminIncidentLive.Form, :edit
