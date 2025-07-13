@@ -12,6 +12,8 @@ defmodule HeadsUp.Accounts.User do
     field :confirmed_at, :utc_datetime
 
     timestamps(type: :utc_datetime)
+
+    has_many :responses, HeadsUp.Responses.Response
   end
 
   @doc """
