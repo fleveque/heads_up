@@ -5,5 +5,7 @@ alias HeadsUp.Admin
 alias HeadsUp.Categories.Category
 alias HeadsUp.Accounts
 alias HeadsUp.Accounts.User
+alias HeadsUp.Responses
+alias HeadsUp.Responses.Response
 import Ecto.Query
 import Ecto.Changeset

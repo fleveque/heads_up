@@ -14,6 +14,27 @@ alias HeadsUp.Repo
 alias HeadsUp.Incidents.Incident
 alias HeadsUp.Categories.Category
 alias HeadsUp.Accounts.User
+alias HeadsUp.Responses.Response
+
+fleveque =
+  %User{}
+  |> User.registration_changeset(%{
+    email: "francesc@example.com",
+    username: "fleveque",
+    admin: true,
+    password: "123456123456"
+  })
+  |> Repo.insert!()
+
+user =
+  %User{}
+  |> User.registration_changeset(%{
+    email: "user@example.com",
+    username: "user",
+    admin: false,
+    password: "123456123456"
+  })
+  |> Repo.insert!()
 
 animals =
   %Category{name: "Animals & Wildlife", slug: "animals-and-wildlife"}
@@ -39,7 +60,19 @@ nature =
   priority: 2,
   status: :pending,
   image_path: "/images/lost-dog.jpg",
-  category: animals
+  category: animals,
+  responses: [
+    %Response{
+      user: fleveque,
+      note: "I can help find the owner of this dog!",
+      status: :arrived
+    },
+    %Response{
+      user: user,
+      note: "I can help with this incident!",
+      status: :enroute
+    }
+  ]
 }
 |> Repo.insert!()
 
@@ -173,13 +206,4 @@ nature =
   image_path: "/images/suspicious-vehicle.jpg",
   category: vehicles
 }
-|> Repo.insert!()
-
-%User{}
-|> User.registration_changeset(%{
-  email: "francesc@example.com",
-  username: "fleveque",
-  admin: true,
-  password: "123456123456"
-})
 |> Repo.insert!()
