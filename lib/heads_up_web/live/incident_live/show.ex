@@ -4,7 +4,11 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   alias HeadsUp.Incidents
   import HeadsUpWeb.CustomComponents
 
+  on_mount {HeadsUpWeb.UserAuth, :mount_current_user}
+
   def mount(_params, _session, socket) do
+    socket = assign(socket, :form, to_form(%{}))
+
     {:ok, socket}
   end
 
@@ -49,7 +53,28 @@ defmodule HeadsUpWeb.IncidentLive.Show do
         </section>
       </div>
       <div class="activity">
-        <div class="left"></div>
+        <div class="left">
+          <div :if={@incident.status == :pending}>
+            <%= if @current_user do %>
+              <.form for={@form} id="response-form">
+                <.input
+                  field={@form[:status]}
+                  type="select"
+                  prompt="Choose a status"
+                  options={[:enroute, :arrived, :departed]}
+                />
+
+                <.input field={@form[:note]} type="textarea" placeholder="Note..." autofocus />
+
+                <.button>Post</.button>
+              </.form>
+            <% else %>
+              <.link href={~p"/users/log-in"} class="button">
+                Log In To Post
+              </.link>
+            <% end %>
+          </div>
+        </div>
         <div class="right">
           <.urgent_incidents incidents={@urgent_incidents} />
         </div>
