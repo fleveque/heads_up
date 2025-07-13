@@ -19,9 +19,13 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   def handle_params(%{"id" => id}, _uri, socket) do
     incident = Incidents.get_incident!(id)
 
+    responses = Incidents.list_responses(incident)
+
     socket =
       socket
       |> assign(:incident, incident)
+      |> stream(:responses, responses)
+      |> assign(:response_count, Enum.count(responses))
       |> assign(:page_title, incident.name)
       # For more control, use start_async, handle_async and AsyncResult
       |> assign_async(
@@ -51,6 +55,9 @@ defmodule HeadsUpWeb.IncidentLive.Show do
               {@incident.priority}
             </div>
           </header>
+          <div class="totals">
+            {@response_count} Responses
+          </div>
           <div class="description">
             {@incident.description}
           </div>
@@ -77,6 +84,13 @@ defmodule HeadsUpWeb.IncidentLive.Show do
                 Log In To Post
               </.link>
             <% end %>
+          </div>
+          <div id="responses" phx-update="stream">
+            <.response
+              :for={{dom_id, response} <- @streams.responses}
+              id={dom_id}
+              response={response}
+            />
           </div>
         </div>
         <div class="right">
@@ -117,6 +131,33 @@ defmodule HeadsUpWeb.IncidentLive.Show do
     """
   end
 
+  attr :id, :string, required: true
+  attr :response, Response, required: true
+
+  def response(assigns) do
+    ~H"""
+    <div class="response" id={@id}>
+      <span class="timeline"></span>
+      <section>
+        <div class="avatar">
+          <.icon name="hero-user-solid" />
+        </div>
+        <div>
+          <span class="username">
+            {@response.user.username}
+          </span>
+          <span>
+            {@response.status}
+          </span>
+          <blockquote>
+            {@response.note}
+          </blockquote>
+        </div>
+      </section>
+    </div>
+    """
+  end
+
   def handle_event("validate", %{"response" => response_params}, socket) do
     changeset = Responses.change_response(%Response{}, response_params)
 
@@ -127,9 +168,14 @@ defmodule HeadsUpWeb.IncidentLive.Show do
     %{incident: incident, current_user: current_user} = socket.assigns
 
     case Responses.create_response(incident, current_user, response_params) do
-      {:ok, _response} ->
+      {:ok, response} ->
         changeset = Responses.change_response(%Response{})
-        socket = assign(socket, :form, to_form(changeset))
+
+        socket =
+          socket
+          |> assign(:form, to_form(changeset))
+          |> stream_insert(:responses, response, at: 0)
+          |> update(:response_count, &(&1 + 1))
 
         {:noreply, socket |> put_flash(:info, "Response created successfully.")}
 

@@ -83,6 +83,14 @@ defmodule HeadsUp.Incidents do
     |> Repo.preload(:category)
   end
 
+  def list_responses(incident) do
+    incident
+    |> Ecto.assoc(:responses)
+    |> preload(:user)
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
+  end
+
   def urgent_incidents(incident) do
     # Simulate a delay for fetching urgent incidents
     Process.sleep(2000)
