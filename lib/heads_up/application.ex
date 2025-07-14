@@ -12,6 +12,7 @@ defmodule HeadsUp.Application do
       HeadsUp.Repo,
       {DNSCluster, query: Application.get_env(:heads_up, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: HeadsUp.PubSub},
+      HeadsUpWeb.Presence,
       # Start the Finch HTTP client for sending emails
       {Finch, name: HeadsUp.Finch},
       # Start a worker by calling: HeadsUp.Worker.start_link(arg)

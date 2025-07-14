@@ -4,6 +4,7 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   alias HeadsUp.Incidents
   alias HeadsUp.Responses
   alias HeadsUp.Responses.Response
+  alias HeadsUpWeb.Presence
   import HeadsUpWeb.CustomComponents
 
   on_mount {HeadsUpWeb.UserAuth, :mount_current_user}
@@ -17,9 +18,28 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   end
 
   def handle_params(%{"id" => id}, _uri, socket) do
+    %{current_user: current_user} = socket.assigns
+
     if connected?(socket) do
       Incidents.subscribe(id)
+
+      if current_user do
+        {:ok, _} =
+          Presence.track(self(), topic(id), current_user.username, %{
+            online_at: System.system_time(:second),
+            is_admin: current_user.is_admin
+          })
+      end
     end
+
+    presences =
+      Presence.list(topic(id))
+      |> Enum.map(fn {username, %{metas: metas}} ->
+        %{
+          id: username,
+          metas: metas
+        }
+      end)
 
     incident = Incidents.get_incident!(id)
 
@@ -29,6 +49,7 @@ defmodule HeadsUpWeb.IncidentLive.Show do
       socket
       |> assign(:incident, incident)
       |> stream(:responses, responses)
+      |> stream(:presences, presences)
       |> assign(:response_count, Enum.count(responses))
       |> assign(:page_title, incident.name)
       # For more control, use start_async, handle_async and AsyncResult
@@ -43,12 +64,14 @@ defmodule HeadsUpWeb.IncidentLive.Show do
     {:noreply, socket}
   end
 
+  defp topic(id), do: "incident_watchers:#{id}"
+
   def render(assigns) do
     ~H"""
     <div class="incident-show">
       <.headline :if={@incident.heroic_response}>
-        <.icon name="hero-sparkles-solid" /> Heroic Responder:
-        {@incident.heroic_response.user.username}
+        <.icon name="hero-sparkles-solid" />
+        Heroic Responder: {@incident.heroic_response.user.username}
         <:tagline>
           {@incident.heroic_response.note}
         </:tagline>
@@ -106,10 +129,32 @@ defmodule HeadsUpWeb.IncidentLive.Show do
         </div>
         <div class="right">
           <.urgent_incidents incidents={@urgent_incidents} />
+          <.incident_watchers :if={@current_user} presences={@streams.presences} />
         </div>
       </div>
       <.back navigate={~p"/incidents"}>All Incidents</.back>
     </div>
+    """
+  end
+
+  attr :presences, :list, required: true
+
+  def incident_watchers(assigns) do
+    ~H"""
+    <section>
+      <h4>Who's here</h4>
+      <ul class="presences" id="incident-watchers" phx-update="stream">
+        <li :for={{dom_id, %{id: username, metas: metas}} <- @presences} id={dom_id}>
+          <.icon
+            name={
+              if List.first(metas)[:is_admin], do: "hero-user-plus", else: "hero-user-circle-solid"
+            }
+            class="w-5 h-5"
+          />
+          {username} ({length(metas)} online)
+        </li>
+      </ul>
+    </section>
     """
   end
 
