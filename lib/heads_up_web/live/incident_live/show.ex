@@ -29,6 +29,8 @@ defmodule HeadsUpWeb.IncidentLive.Show do
             online_at: System.system_time(:second),
             is_admin: current_user.is_admin
           })
+
+        Phoenix.PubSub.subscribe(HeadsUp.PubSub, "updates:" <> topic(id))
       end
     end
 
@@ -142,8 +144,8 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   def incident_watchers(assigns) do
     ~H"""
     <section>
-      <h4>Who's here</h4>
-      <ul class="presences" id="incident-watchers" phx-update="stream">
+      <h4>Onlookers</h4>
+      <ul class="presences" id="onlookers" phx-update="stream">
         <li :for={{dom_id, %{id: username, metas: metas}} <- @presences} id={dom_id}>
           <.icon
             name={
@@ -254,5 +256,17 @@ defmodule HeadsUpWeb.IncidentLive.Show do
       |> assign(:page_title, incident.name)
 
     {:noreply, socket}
+  end
+
+  def handle_info({:user_joined, presence}, socket) do
+    {:noreply, stream_insert(socket, :presences, presence)}
+  end
+
+  def handle_info({:user_left, presence}, socket) do
+    if presence.metas == [] do
+      {:noreply, stream_delete(socket, :presences, presence)}
+    else
+      {:noreply, stream_insert(socket, :presences, presence)}
+    end
   end
 end
