@@ -44,4 +44,28 @@ defmodule HeadsUpWeb.Presence do
 
     {:ok, state}
   end
+
+  def topic(id), do: "incident_watchers:#{id}"
+
+  def track_user(id, current_user) do
+    {:ok, _} =
+      track(self(), topic(id), current_user.username, %{
+        online_at: System.system_time(:second),
+        is_admin: current_user.is_admin
+      })
+  end
+
+  def subscribe(id) do
+    Phoenix.PubSub.subscribe(HeadsUp.PubSub, "updates:" <> topic(id))
+  end
+
+  def list_users(id) do
+    list(topic(id))
+    |> Enum.map(fn {username, %{metas: metas}} ->
+      %{
+        id: username,
+        metas: metas
+      }
+    end)
+  end
 end
