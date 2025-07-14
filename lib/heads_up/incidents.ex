@@ -88,7 +88,7 @@ defmodule HeadsUp.Incidents do
 
   def get_incident!(id) do
     Repo.get!(Incident, id)
-    |> Repo.preload(:category)
+    |> Repo.preload([:category, heroic_response: :user])
   end
 
   def list_responses(incident) do

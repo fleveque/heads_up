@@ -44,4 +44,25 @@ defmodule HeadsUp.Admin do
   def change_incident(%Incident{} = incident, attrs \\ %{}) do
     Incident.changeset(incident, attrs)
   end
+
+  def draw_heroic_response(%Incident{status: :resolved} = incident) do
+    incident = Repo.preload(incident, :responses)
+
+    case incident.responses do
+      [] ->
+        {:error, "No responses to draw!"}
+
+      responses ->
+        response = Enum.random(responses)
+
+        {:ok, _incident} =
+          update_incident(incident, %{
+            heroic_response_id: response.id
+          })
+    end
+  end
+
+  def draw_heroic_response(%Incident{}) do
+    {:error, "Incident must be resolved to draw a heroic response!"}
+  end
 end
