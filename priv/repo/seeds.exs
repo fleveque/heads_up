@@ -21,17 +21,17 @@ fleveque =
   |> User.registration_changeset(%{
     email: "francesc@example.com",
     username: "fleveque",
-    admin: true,
     password: "123456123456"
   })
   |> Repo.insert!()
+
+{:ok, fleveque} = HeadsUp.Accounts.promote_to_admin(fleveque)
 
 user =
   %User{}
   |> User.registration_changeset(%{
     email: "user@example.com",
     username: "user",
-    admin: false,
     password: "123456123456"
   })
   |> Repo.insert!()
