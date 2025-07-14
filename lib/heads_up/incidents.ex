@@ -5,6 +5,14 @@ defmodule HeadsUp.Incidents do
 
   @valid_statuses Ecto.Enum.values(Incident, :status) |> Enum.map(&to_string/1)
 
+  def subscribe(incident_id) do
+    Phoenix.PubSub.subscribe(HeadsUp.PubSub, "incident:#{incident_id}")
+  end
+
+  def broadcast(incident_id, message) do
+    Phoenix.PubSub.broadcast(HeadsUp.PubSub, "incident:#{incident_id}", message)
+  end
+
   def list_incidents do
     Repo.all(Incident)
   end

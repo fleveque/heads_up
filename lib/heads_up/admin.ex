@@ -2,6 +2,7 @@ defmodule HeadsUp.Admin do
   alias HeadsUp.Incidents.Incident
 
   alias HeadsUp.Repo
+  alias HeadsUp.Incidents
   import Ecto.Query
 
   def list_incidents do
@@ -20,6 +21,16 @@ defmodule HeadsUp.Admin do
     incident
     |> Incident.changeset(attrs)
     |> Repo.update()
+    |> case do
+      {:ok, incident} ->
+        incident = Repo.preload(incident, :category)
+        Incidents.broadcast(incident.id, {:incident_updated, incident})
+
+        {:ok, incident}
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   def get_incident!(id) do
